@@ -1,0 +1,8 @@
+out/
+result
+result-*
+__pycache__/
+.pytest_cache/
+# your own songs stay local (most are under copyright); only the public-domain sample is tracked
+songs/*
+!songs/amazing-grace/

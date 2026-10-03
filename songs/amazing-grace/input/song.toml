@@ -1,0 +1,62 @@
+# Amazing Grace: the sample input, transcribed from sheet.pdf. Every field pianist reads is shown;
+# optional ones are commented out with what they default to.
+# Melody bars are ABC with L:1/8 (one unit = an eighth note), written against the key signature.
+title = "Amazing Grace"
+composer = "John Newton (words, 1779) & New Britain (melody, 1829)"
+key = "G"                 # major or minor: C, G, Bb, F#m, Am ...
+meter = "3/4"             # 2/4 3/4 4/4 6/8 9/8 12/8
+tempo = 80                # beats per minute (dotted quarters in 6/8, 9/8, 12/8)
+seed = 1                  # the humanizer's random seed: same seed, same performance
+soundfont = "salamander"  # or "upright"
+# ritardando = [77, 73, 70, ...]  # BPM per beat through the last section; default: ease down to half tempo
+
+[parts.verse]
+pickup = "D2"   # the upbeat into this part: before bar 1 if the song opens with it, else at the end of the previous section
+# Beats are separated by spaces, the eighths of one beat joined (BG) so they beam; "-" ties into the next bar.
+melody = [
+  "G4 BG", "B4 A2", "G4 E2", "D4 D2",
+  "G4 BG", "B4 A2", "d6-", "d4 B2",
+  "d3 B dB", "G4 D2", "E3 G GE", "D4 D2",
+  "G4 BG", "B4 A2", "G6-", "G4 z2",  # the last bar completes the upbeat
+]
+# One entry per bar; "C D7" would change chord at the half bar. chords = "auto" harmonizes the melody instead.
+chords = [
+  "G", "G7", "C", "G", "G", "Em", "D", "D7",
+  "G", "G7", "C", "G", "Em", "D7", "G", "G",
+]
+# Two written voices go in one chord, melody first: "[dB]". A part can borrow another's chords: chords_from = "verse"
+
+[[sections]]               # played in this order
+name = "intro"
+label = "Intro"            # printed above the section
+part = "verse"
+bars = [13, 16]            # a slice of the part; default: all of it
+transform = "top_voice_up" # none | top_voice_up (melody alone, an octave up) | octaves (melody doubled an octave up)
+lh = "hold"                # left hand: flow | rise | octave | hold, for every bar or as a list ("flow*8")
+dynamic = 0.6              # loudness scale; default 1.0
+# shape = "flat"           # flat | arch (build up to the last line) | fade
+
+[[sections]]
+name = "verse1"
+label = "1."
+part = "verse"
+lh = ["flow*8", "rise*8"]
+dynamic = 0.8
+
+[[sections]]
+name = "verse2"
+label = "2."
+part = "verse"
+transform = "octaves"
+lh = "octave"
+dynamic = 1.0
+shape = "arch"
+
+[[sections]]
+name = "coda"
+label = "Coda"
+part = "verse"
+bars = [13, 16]
+lh = ["flow*3", "hold"]
+dynamic = 0.66
+shape = "fade"

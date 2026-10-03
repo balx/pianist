@@ -1,0 +1,1 @@
+target-version = "py312"  # the nix shell runs a newer Python; tomllib must count as the standard library

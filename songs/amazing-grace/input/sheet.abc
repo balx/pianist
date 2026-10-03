@@ -1,0 +1,25 @@
+% Amazing Grace: lead sheet engraved for pianist's sample (CC0). Melody "New Britain" (1829) and words (John Newton, 1779)
+% are in the public domain; the chord symbols are this arrangement's own. Rebuild: abcm2ps -v -O sheet sheet.abc,
+% then rsvg-convert -f pdf -o sheet.pdf sheet001.svg
+X:1
+T:Amazing Grace
+C:Words: John Newton (1779)
+C:Melody: New Britain (1829)
+M:3/4
+L:1/8
+Q:1/4=80
+K:G
+%%gchordfont Helvetica 13
+D2 | "G"G4 BG | "G7"B4 A2 | "C"G4 E2 | "G"D4 D2 |
+"G"G4 BG | "Em"B4 A2 | "D"d6- | "D7"d4 B2 |
+"G"d3 B dB | "G7"G4 D2 | "C"E3 G GE | "G"D4 D2 |
+"Em"G4 BG | "D7"B4 A2 | "G"G6- | "G"G4 |]
+W:1. Amazing grace! how sweet the sound
+W:   That saved a wretch like me!
+W:   I once was lost, but now am found,
+W:   Was blind, but now I see.
+W:
+W:2. 'Twas grace that taught my heart to fear,
+W:   And grace my fears relieved;
+W:   How precious did that grace appear
+W:   The hour I first believed!
