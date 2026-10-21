@@ -15,6 +15,7 @@ let
   segnet = model "segnet_308-3296ccd40960f90ca6ab9c035cca945675d30a0f" "sha256-HUJ3NUqDl6aDDvEnkjLm2YnC0lS3RRUl5T/z03VLH3A=";
   segnet16 = model "segnet_308-3296ccd40960f90ca6ab9c035cca945675d30a0f_fp16" "sha256-jQWjf+doKWc7yd7wp8rxaOWGCqTRqPesG2Ejqmn+PYI="; # used on Apple Silicon (CoreML)
   encoder = model "encoder_pytorch_model_396-f6feedb42ff90087d898b0941a55d040fa6b2903" "sha256-nZvETaaMEYDIUXPXOe2y1wPZDA27363J6/ZjZoWlSJs=";
+  encoder16 = model "encoder_pytorch_model_396-f6feedb42ff90087d898b0941a55d040fa6b2903_fp16" "sha256-gQE2jf6leq+0l5zXSAqlQlFkiW6ZyOyjGrCkI1qPGk8="; # --coreml-encoder on Apple Silicon
   decoder = model "decoder_pytorch_model_396-f6feedb42ff90087d898b0941a55d040fa6b2903" "sha256-Ci8CPh7PQfX5afLtTvgMBQzimkmWxmVQVs82xhBGd+g=";
 in
 py.buildPythonApplication rec {
@@ -37,6 +38,7 @@ py.buildPythonApplication rec {
     unzip -q ${segnet} -d $pkg/segmentation
     unzip -q ${segnet16} -d $pkg/segmentation
     unzip -q ${encoder} -d $pkg/transformer
+    unzip -q ${encoder16} -d $pkg/transformer
     unzip -q ${decoder} -d $pkg/transformer
   '';
   doCheck = false;
