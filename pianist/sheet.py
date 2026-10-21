@@ -1,6 +1,7 @@
 """A sheet (PDF, image or link) -> a new songs/<slug>/input/ holding sheet.<ext> and a song.toml written by a reader."""
 
 import http.client
+import os
 import re
 import shutil
 import subprocess
@@ -10,6 +11,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from .build import build
@@ -107,18 +109,30 @@ def pages(sheet: Path, work: Path) -> list[Path]:
     return sorted(work.glob("page-*.png"))
 
 
-def _tool(cmd: list[str]) -> subprocess.CompletedProcess:
+def _tool(cmd: list[str], env: dict[str, str] | None = None) -> subprocess.CompletedProcess:
     try:
-        return subprocess.run(cmd, capture_output=True, text=True, check=False)
+        return subprocess.run(cmd, capture_output=True, text=True, check=False, env=env)
     except FileNotFoundError:
         raise SheetError(f"{cmd[0]} is not installed: run inside `nix develop`") from None
 
 
+def _homr(page: Path) -> subprocess.CompletedProcess:
+    """homr on one page image. On Apple Silicon its encoder runs on the GPU (CoreML; ignored elsewhere), about 1.35x faster,
+    once the compiled model is cached: in the user's cache, as homr's default is next to the model, in the read-only Nix store."""
+    cache = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / "pianist" / "homr-coreml"
+    return _tool(["homr", "--coreml-encoder", str(page)], env=os.environ | {"HOMR_COREML_MODEL_CACHE_DIR": str(cache)})
+
+
 def read_omr(sheet: Path, work: Path, title: str) -> tuple[str, list[str]]:
-    """Optical music recognition with homr, page by page; the measures of all pages joined into one score."""
+    """Optical music recognition with homr, pages in parallel; the measures of all pages joined into one score."""
     score = None
-    for page in pages(sheet, work):
-        p = _tool(["homr", str(page)])
+    images = pages(sheet, work)
+    # The first page alone fills the CoreML cache (parallel homrs racing to create it fall back to the CPU). Each homr then
+    # already uses ~6 cores and ~1.5 GB, so 4 at once is about 1.6x faster than one at a time; more only adds memory.
+    runs = [_homr(images[0])]
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        runs += pool.map(_homr, images[1:])
+    for page, p in zip(images, runs):
         xml = page.with_suffix(".musicxml")
         if p.returncode != 0 or not xml.exists():
             raise SheetError(f"homr could not read {page.name}:\n{p.stderr[-2000:]}")
